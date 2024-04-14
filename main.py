@@ -143,6 +143,8 @@ with st.spinner('Loading...'):
                          name = "Precipitation mm"),
                   secondary_y = True,)
     
+
+    
     time_now = datetime.now(tmz.utc)+tzoffset
     
     fig.add_vline(x = time_now, line_color="red", opacity=0.4)
