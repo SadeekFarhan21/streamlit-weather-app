@@ -6,3 +6,4 @@ datetime
 plotly
 tzwhere
 folium
+streamlit_folium
