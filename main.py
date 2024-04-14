@@ -42,7 +42,7 @@ data = pd.read_csv(file)
 
 # Select Country
 country_set = set(data.loc[:,"country"])
-country = st.selectbox('Select a country', options=sorted(country_set))
+country = st.selectbox('Select a country', options=country_set)
 
 country_data = data.loc[data.loc[:,"country"] == country,:]
 
@@ -59,75 +59,51 @@ response_current = requests.get(f'https://api.open-meteo.com/v1/forecast?latitud
 st.subheader("Current weather")
 
 result_current = json.loads(response_current._content)
+
 current = result_current["current_weather"]
 temp = current["temperature"]
 speed = current["windspeed"]
 direction = current["winddirection"]
 
-def to_fahrenheit(celsius):
-    return (celsius * 9/5 + 32)
-
-def to_miles_per_hour(mps):
-    return (mps * 0.621371)
-temp = round(to_fahrenheit(temp), 1)
-speed = round(to_miles_per_hour(speed), 1)
-
 # Increment added or substracted from degree values for wind direction
 ddeg = 11.25
 
 # Determine wind direction based on received degrees
-def get_common_direction(direction, ddeg):
-    if direction >= (360 - ddeg) or direction < (0 + ddeg):
-        return "North"
-    elif direction >= (337.5 - ddeg) and direction < (337.5 + ddeg):
-        return "North/Northwest"
-    elif direction >= (315 - ddeg) and direction < (315 + ddeg):
-        return "Northwest"
-    elif direction >= (292.5 - ddeg) and direction < (292.5 + ddeg):
-        return "West/Northwest"
-    elif direction >= (270 - ddeg) and direction < (270 + ddeg):
-        return "West"
-    elif direction >= (247.5 - ddeg) and direction < (247.5 + ddeg):
-        return "West/Southwest"
-    elif direction >= (225 - ddeg) and direction < (225 + ddeg):
-        return "Southwest"
-    elif direction >= (202.5 - ddeg) and direction < (202.5 + ddeg):
-        return "South/Southwest"
-    elif direction >= (180 - ddeg) and direction < (180 + ddeg):
-        return "South"
-    elif direction >= (157.5 - ddeg) and direction < (157.5 + ddeg):
-        return "South/Southeast"
-    elif direction >= (135 - ddeg) and direction < (135 + ddeg):
-        return "Southeast"
-    elif direction >= (112.5 - ddeg) and direction < (112.5 + ddeg):
-        return "East/Southeast"
-    elif direction >= (90 - ddeg) and direction < (90 + ddeg):
-        return "East"
-    elif direction >= (67.5 - ddeg) and direction < (67.5 + ddeg):
-        return "East/Northeast"
-    elif direction >= (45 - ddeg) and direction < (45 + ddeg):
-        return "Northeast"
-    elif direction >= (22.5 - ddeg) and direction < (22.5 + ddeg):
-        return "North/Northeast"
-    else:
-        return "Unknown"
-    
-common_dir = get_common_direction(direction, ddeg)
-
-temperature, wind, direction = st.columns(3)
+if direction >= (360-ddeg) or direction < (0+ddeg):
+    common_dir = "N"
+elif direction >= (337.5-ddeg) and direction < (337.5+ddeg):
+    common_dir = "N/NW"
+elif direction >= (315-ddeg) and direction < (315+ddeg):
+    common_dir = "NW"
+elif direction >= (292.5-ddeg) and direction < (292.5+ddeg):
+    common_dir = "W/NW"
+elif direction >= (270-ddeg) and direction < (270+ddeg):
+    common_dir = "W"
+elif direction >= (247.5-ddeg) and direction < (247.5+ddeg):
+    common_dir = "W/SW"
+elif direction >= (225-ddeg) and direction < (225+ddeg):
+    common_dir = "SW"
+elif direction >= (202.5-ddeg) and direction < (202.5+ddeg):
+    common_dir = "S/SW"
+elif direction >= (180-ddeg) and direction < (180+ddeg):
+    common_dir = "S"
+elif direction >= (157.5-ddeg) and direction < (157.5+ddeg):
+    common_dir = "S/SE"
+elif direction >= (135-ddeg) and direction < (135+ddeg):
+    common_dir = "SE"
+elif direction >= (112.5-ddeg) and direction < (112.5+ddeg):
+    common_dir = "E/SE"
+elif direction >= (90-ddeg) and direction < (90+ddeg):
+    common_dir = "E"
+elif direction >= (67.5-ddeg) and direction < (67.5+ddeg):
+    common_dir = "E/NE"
+elif direction >= (45-ddeg) and direction < (45+ddeg):
+    common_dir = "NE"
+elif direction >= (22.5-ddeg) and direction < (22.5+ddeg):
+    common_dir = "N/NE"
 
 
-with temperature:
-    st.subheader(f'{temp} °F')
-    st.write('Temperature')
-with wind:
-    st.subheader(f'{speed} MPH')
-    st.write('Wind Speed')
-with direction:
-    st.subheader(f'{common_dir}')
-    st.write('Wind Direction')
-
-# st.info(f"The current temperature is {temp} °F. \n The wind speed is {speed} MPH. \n The wind is coming from {common_dir}.")
+st.info(f"The current temperature is {temp} °C. \n The wind speed is {speed} m/s. \n The wind is coming from {common_dir}.")
 
 st.subheader("Week ahead")
 
@@ -139,9 +115,9 @@ with st.spinner('Loading...'):
     hourly = result_hourly["hourly"]
     hourly_df = pd.DataFrame.from_dict(hourly)
     hourly_df.rename(columns = {'time':'Week ahead'}, inplace = True)
-    hourly_df.rename(columns = {'temperature_2m':'Temperature'}, inplace = True)
+    hourly_df.rename(columns = {'temperature_2m':'Temperature °C'}, inplace = True)
     hourly_df.rename(columns = {'precipitation':'Precipitation mm'}, inplace = True)
-    hourly_df['Temperature'] = (hourly_df['Temperature'] * 9 / 5 + 32)
+    
     tz = tzwhere.tzwhere(forceTZ=True)
     timezone_str = tz.tzNameAt(lat, lng, forceTZ=True) # Seville coordinates
     
@@ -158,8 +134,8 @@ with st.spinner('Loading...'):
     
     # Add traces
     fig.add_trace(go.Scatter(x = week_ahead+tzoffset, 
-                             y = hourly_df['Temperature'],
-                             name = "Temperature"),
+                             y = hourly_df['Temperature °C'],
+                             name = "Temperature °C"),
                   secondary_y = False,)
     
     fig.add_trace(go.Bar(x = week_ahead+tzoffset, 
@@ -170,14 +146,14 @@ with st.spinner('Loading...'):
     time_now = datetime.now(tmz.utc)+tzoffset
     
     fig.add_vline(x = time_now, line_color="red", opacity=0.4)
-    fig.add_annotation(x = time_now, y=max(hourly_df['Temperature'])+5,
+    fig.add_annotation(x = time_now, y=max(hourly_df['Temperature °C'])+5,
                 text = time_now.strftime("%d %b %y, %H:%M"),
                 showarrow=False,
                 yshift=0)
     
-    fig.update_yaxes(range=[min(hourly_df['Temperature'])-10,
-                            max(hourly_df['Temperature'])+10],
-                      title_text="Temperature",
+    fig.update_yaxes(range=[min(hourly_df['Temperature °C'])-10,
+                            max(hourly_df['Temperature °C'])+10],
+                      title_text="Temperature °C",
                      secondary_y=False,
                      showgrid=False,
                      zeroline=False)
@@ -221,6 +197,10 @@ with st.spinner('Loading...'):
     st_data = folium_static(m, height = 370)
     
        
-
+    # Concluding remarks
+    st.write('Weather data source: [http://open-meteo.com](http://open-meteo.com) \n\n'+
+             'List of 40,000+ world cities: [https://simplemaps.com/data/world-cities](https://simplemaps.com/data/world-cities) \n\n' +
+             'Github repository: [streamlit-weather-app](https://github.com/ndakov/streamlit-weather-app)')
+    st.write('Thanks for stopping by. Cheers!')
 
 
