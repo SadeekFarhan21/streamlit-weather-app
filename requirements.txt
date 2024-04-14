@@ -109,7 +109,7 @@ parso==0.8.2
 patsy==0.5.3
 pickleshare==0.7.5
 pipp==0.0.1
-plotly==5.3.1
+plotly==5.1.1
 plotly-express==0.4.1
 pooch==1.6.0
 prometheus-client==0.12.0

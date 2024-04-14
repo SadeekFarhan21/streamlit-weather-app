@@ -69,7 +69,7 @@ def to_fahrenheit(celsius):
 
 def to_miles_per_hour(mps):
     return (mps * 0.621371)
-temp = round(to_fahrenheit(temp), 2)
+temp = round(to_fahrenheit(temp), 1)
 speed = round(to_miles_per_hour(speed), 1)
 
 # Increment added or substracted from degree values for wind direction
