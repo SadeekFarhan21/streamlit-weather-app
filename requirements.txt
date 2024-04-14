@@ -1,7 +1,6 @@
 streamlit
 pandas
 requests
-json
 plotly
 datetime
 plotly
