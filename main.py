@@ -197,6 +197,8 @@ with st.spinner('Loading...'):
     
     # Display map
     st_data = folium_static(m, height = 370)
+    # Display map
+    #st.folium_chart(m)
     
        
     # Concluding remarks

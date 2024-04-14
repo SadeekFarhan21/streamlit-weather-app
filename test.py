@@ -1,21 +1,10 @@
 import streamlit as st
 
-st.title('Farhan')
-temperature, wind, direction = st.columns(3)
+def main():
+    st.title("Map in Streamlit")
 
-temp = 20
-speed = 45
-common_dir = 'North'
+    # Display a map centered on a specific location
+    st.map([40.7128, -74.0060], zoom=10)
 
-
-
-with temperature:
-    st.subheader(f'{temp} °F')
-    st.write('Temperature')
-with wind:
-    st.subheader(f'{speed} MPH')
-    st.write('Wind Speed')
-with direction:
-    st.subheader(f'{common_dir}')
-    st.write('Wind Direction')
-    
+if __name__ == "__main__":
+    main()
